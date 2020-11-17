@@ -15,7 +15,6 @@ public class WorldCreator : MonoBehaviour
     public int seed;
     public float amplitude;
     public float lacunarity;
-    private bool isAdditive = false;
 
     public Generator.TileLayerMode layerMode;
 
@@ -51,17 +50,17 @@ public class WorldCreator : MonoBehaviour
             {
                 case Generator.TileLayerMode.Standard:
 
-                    generator.GenerateGrid(x, y, PlayerCellPosition(), tilemap, seed, amplitude, lacunarity, 0, isAdditive);
+                    generator.GenerateGrid(x, y, PlayerCellPosition(), tilemap, seed, amplitude, lacunarity, 0);
                     break;
 
                 case Generator.TileLayerMode.Cross:
 
-                    generator.GenerateCrossGrid(x, y, PlayerCellPosition(), size, offsetX, offsetY, tilemap, seed, amplitude, lacunarity, 0, isAdditive);
+                    generator.GenerateGrid(x, y, PlayerCellPosition(), size, offsetX, offsetY, tilemap, seed, amplitude, lacunarity, 0);
                     break;
 
                 case Generator.TileLayerMode.Circular:
 
-                    generator.GenerateCicularGrid(PlayerCellPosition(), size, circularGridMode, tilemap, seed, amplitude, lacunarity, 0, isAdditive);
+                    generator.GenerateGrid(PlayerCellPosition(), size, circularGridMode, tilemap, seed, amplitude, lacunarity, 0);
                     break;
                 default:
 

@@ -1,22 +1,53 @@
-﻿namespace UnityEngine.Tilemaps.ProceduralGeneration
+﻿using Assets;
+
+namespace UnityEngine.Tilemaps.ProceduralGeneration
 {
     public class NoiseTileGenerator: MonoBehaviour
     {
+        ///This structure prevents users from creating more than one instances of this component on the scene.
+#if UNITY_EDITOR
+        public static Component oldInstance = null;
 
-        public NoiseSet[] noiseSets;
-        private static NoiseSet[] staticNoiseSets;
-
-        private void Start()
+        private void OnValidate()
         {
-            staticNoiseSets = noiseSets;
+            if (oldInstance == null)
+            {
+                oldInstance = this;
+            }
         }
+        private void Reset()
+        {
+            if (oldInstance != null && oldInstance != this)
+            {
+                if (UnityEditor.EditorUtility.DisplayDialog("Component already exists on scene", "Do you want to replace it?", "Ok, replace it", "No, thanks!"))
+                {
+                    gameObject.AddComponent<DeleteComponent>().componentReference = oldInstance;
+                    oldInstance = null;
+                }
+                else
+                {
+                    gameObject.AddComponent<DeleteComponent>().componentReference = this;
+                }
+            }
+        }
+#endif
 
+        private static NoiseSet[] staticNoiseSets;
+        public NoiseSet[] noiseSets;
+
+        private void Awake()
+        {
+            if(staticNoiseSets == null)
+            {
+                staticNoiseSets = noiseSets;
+            }
+        }
 
         public static TileBase GetTile(int seed, float amplitude, float lacunarity, Vector3 position, int set)
         {
             TileBase tile = null;
 
-            float noiseValue = Mathf.Clamp(Mathf.PerlinNoise(((float)position.x + seed) * amplitude / lacunarity, ((float)position.y + seed) * amplitude / lacunarity), 0f, 1f);
+            float noiseValue = Mathf.PerlinNoise(((float)position.x + seed) * amplitude / lacunarity, ((float)position.y + seed) * amplitude / lacunarity);
 
             if(staticNoiseSets != null)
             {
@@ -27,7 +58,11 @@
                         tile = staticNoiseSets[set].noiseLayers[i].tile;
                         break;
                     }
-
+                    else if(noiseValue < 0 || noiseValue > 1)
+                    {
+                        tile = staticNoiseSets[set].noiseLayers[i].tile;
+                        break;
+                    }
                 }
             }
            
@@ -38,6 +73,8 @@
     [System.Serializable]
     public struct NoiseLayer
     {
+        public bool isWall;
+
         public TileBase tile;
 
         [Range(0, 1)]

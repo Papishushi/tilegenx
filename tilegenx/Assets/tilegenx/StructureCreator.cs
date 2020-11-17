@@ -1,11 +1,10 @@
-﻿using UnityEngine;
+﻿using Boo.Lang;
+using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.Tilemaps.ProceduralGeneration;
 
 public class StructureCreator : MonoBehaviour
 {
-    private Generator generator = null;
-
     public Transform player;
     public Grid grid;
     public Tilemap tilemap;
@@ -16,10 +15,7 @@ public class StructureCreator : MonoBehaviour
     public float amplitude;
     public float lacunarity;
 
-
     public int tileSet;
-
-    public bool isAdditive;
 
     public TileBase rightTopCornerTile = null;
     public TileBase rightBotCornerTile = null;
@@ -37,6 +33,7 @@ public class StructureCreator : MonoBehaviour
     public TileBase botBorderTile = null;
 
     private Vector3Int lastPlayerCellPosition;
+    private Vector3Int lastGenerationCellPosition;
 
     private int randomX = 0;
     private int randomY = 0;
@@ -45,39 +42,51 @@ public class StructureCreator : MonoBehaviour
     private int randomOffsetX = 0;
     private int randomOffsetY = 0;
 
+    private List<Generator> generators = new List<Generator>();
+
     private void Awake()
     {
         lastPlayerCellPosition = Vector3Int.zero;
-        generator = new Generator();
     }
 
     private void Update()
     {
-
-        if (PlayerCellPosition().magnitude > lastPlayerCellPosition.magnitude + 20)
+        if (PlayerCellPosition() != lastPlayerCellPosition)
         {
-            randomX = Random.Range(5, 20);
-            randomY = Random.Range(5, 20);
-            randomCenterOnRange = PlayerCellPosition() + new Vector3Int(Random.Range(-20, 20), Random.Range(-20, 20), 0); 
-            randomSize = Random.Range(1, 10);
-            randomOffsetX = Random.Range(-5, 5);
-            randomOffsetY = Random.Range(-5, 5);
+            if (PlayerCellPosition().magnitude > lastGenerationCellPosition.magnitude + 100)
+            {
+                randomX = Random.Range(5, 20);
+                randomY = Random.Range(5, 20);
+                randomCenterOnRange = PlayerCellPosition() + new Vector3Int(Random.Range(-20, 20), Random.Range(-20, 20), 0);
+                randomSize = Random.Range(1, 10);
+                randomOffsetX = Random.Range(-5, 5);
+                randomOffsetY = Random.Range(-5, 5);
 
-            generator.GenerateCrossGrid(randomX,randomY,randomCenterOnRange,randomSize,randomOffsetX,randomOffsetY, tilemap, seed, amplitude, lacunarity, tileSet, isAdditive);
+                Generator generator = new Generator();
+
+                generators.Add(generator);
+
+                lastGenerationCellPosition = PlayerCellPosition();
+            }
+
+            foreach (Generator generator in generators)
+            {
+                generator.GenerateGrid(randomX, randomY, randomCenterOnRange, randomSize, randomOffsetX, randomOffsetY, tilemap, seed, amplitude, lacunarity, tileSet);
+
+
+                generator.FindLimits(tilemap);
+
+                generator.GenerateLimits(wallTilemap, rightTopCornerTile, rightBotCornerTile, leftTopCornerTile, leftBotCornerTile,
+                    rightTopInnerCornerTile, rightBotInnerCornerTile, leftTopInnerCornerTile, leftBotInnerCornerTile,
+                    topBorderTile, leftBorderTile, rightBorderTile, botBorderTile);
+            }
 
             lastPlayerCellPosition = PlayerCellPosition();
         }
-        if (PlayerCellPosition() != lastPlayerCellPosition)
-        {
+       
 
+       
 
-            generator.FindLimits(tilemap);
-
-            generator.GenerateLimits(wallTilemap, rightTopCornerTile, rightBotCornerTile, leftTopCornerTile, leftBotCornerTile,
-                rightTopInnerCornerTile, rightBotInnerCornerTile, leftTopInnerCornerTile, leftBotInnerCornerTile,
-                topBorderTile, leftBorderTile, rightBorderTile, botBorderTile);
-
-        }
     }
     public Vector3Int PlayerCellPosition()
     {
