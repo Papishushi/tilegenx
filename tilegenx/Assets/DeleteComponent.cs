@@ -1,18 +1,20 @@
 ﻿using UnityEngine;
 
-namespace Assets
+namespace Kutility
 {
-    [ExecuteInEditMode()]
-    public class DeleteComponent : MonoBehaviour
+    /// <summary>
+    /// Destroys inmediatelly any component.
+    /// </summary>
+    public class DeleteComponent : Object
     {
-        public Component componentReference = null;
-        void Start()
+        /// <summary>
+        /// Destroys inmediatelly a given component.
+        /// </summary>
+        /// <param name="componentReference">The component to be destroyed.</param>
+        public DeleteComponent(Component componentReference)
         {
-            if (componentReference != null)
-            {
-                DestroyImmediate(componentReference);
-                DestroyImmediate(this);
-            }
+            DestroyImmediate(componentReference);
+            DestroyImmediate(this);
         }
     }
 }

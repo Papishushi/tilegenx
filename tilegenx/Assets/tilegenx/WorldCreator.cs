@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using Kutility.Serialization;
+using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.Tilemaps.ProceduralGeneration;
+using UnityEngine.Tilemaps.tilegenX;
 
-public class WorldCreator : MonoBehaviour
+public class WorldCreator : Singleton<WorldCreator>
 {
     private Generator generator = null;
 
@@ -36,14 +37,27 @@ public class WorldCreator : MonoBehaviour
 
     private Vector3Int lastPlayerCellPosition;
 
+#if UNITY_EDITOR
+    public override void OnValidate()
+    {
+        base.OnValidate();
+    }
+    public override void Reset()
+    {
+        base.Reset();
+    }
+#endif
+
     private void Awake()
     {
         lastPlayerCellPosition = new Vector3Int(Random.Range(int.MinValue, int.MaxValue), Random.Range(int.MinValue, int.MaxValue), Random.Range(int.MinValue, int.MaxValue));
         generator = new Generator();
     }
 
-    private void Update()
+    public override void Update()
     {
+        base.Update();
+
         if (PlayerCellPosition() != lastPlayerCellPosition)
         {
             switch (layerMode)

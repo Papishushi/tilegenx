@@ -1,7 +1,7 @@
 ﻿using Boo.Lang;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.Tilemaps.ProceduralGeneration;
+using UnityEngine.Tilemaps.tilegenX;
 
 public class StructureCreator : MonoBehaviour
 {

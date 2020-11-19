@@ -1,46 +1,42 @@
-﻿using Assets;
+﻿using Kutility.Serialization;
 
-namespace UnityEngine.Tilemaps.ProceduralGeneration
+namespace UnityEngine.Tilemaps.tilegenX
 {
-    public class NoiseTileGenerator: MonoBehaviour
+    public class NoiseTileGenerator: Singleton<NoiseTileGenerator>
     {
-        ///This structure prevents users from creating more than one instances of this component on the scene.
-#if UNITY_EDITOR
-        public static Component oldInstance = null;
+        private static NoiseSet[] StaticNoiseSets;
+        public NoiseSet[] noiseSets;
 
-        private void OnValidate()
+#if UNITY_EDITOR
+        public override void OnValidate()
         {
-            if (oldInstance == null)
+            base.OnValidate();
+
+            if (noiseSets != null)
             {
-                oldInstance = this;
+                for (int i = 0; i < noiseSets.Length; i++)
+                {
+                    noiseSets[i].SetDefaultNames();
+                }
             }
         }
-        private void Reset()
+        public override void Reset()
         {
-            if (oldInstance != null && oldInstance != this)
-            {
-                if (UnityEditor.EditorUtility.DisplayDialog("Component already exists on scene", "Do you want to replace it?", "Ok, replace it", "No, thanks!"))
-                {
-                    gameObject.AddComponent<DeleteComponent>().componentReference = oldInstance;
-                    oldInstance = null;
-                }
-                else
-                {
-                    gameObject.AddComponent<DeleteComponent>().componentReference = this;
-                }
-            }
+            base.Reset();
         }
 #endif
 
-        private static NoiseSet[] staticNoiseSets;
-        public NoiseSet[] noiseSets;
-
         private void Awake()
         {
-            if(staticNoiseSets == null)
+            if(StaticNoiseSets == null)
             {
-                staticNoiseSets = noiseSets;
+                StaticNoiseSets = noiseSets;
             }
+        }
+
+        public override void Update()
+        {
+            base.Update();
         }
 
         public static TileBase GetTile(int seed, float amplitude, float lacunarity, Vector3 position, int set)
@@ -49,18 +45,18 @@ namespace UnityEngine.Tilemaps.ProceduralGeneration
 
             float noiseValue = Mathf.PerlinNoise(((float)position.x + seed) * amplitude / lacunarity, ((float)position.y + seed) * amplitude / lacunarity);
 
-            if(staticNoiseSets != null)
+            if(StaticNoiseSets != null)
             {
-                for (int i = 0; i < staticNoiseSets[set].noiseLayers.Length; i++)
+                for (int i = 0; i < StaticNoiseSets[set].noiseLayers.Length; i++)
                 {
-                    if (noiseValue >= staticNoiseSets[set].noiseLayers[i].minRange && noiseValue <= staticNoiseSets[set].noiseLayers[i].maxRange)
+                    if (noiseValue >= StaticNoiseSets[set].noiseLayers[i].minRange && noiseValue <= StaticNoiseSets[set].noiseLayers[i].maxRange)
                     {
-                        tile = staticNoiseSets[set].noiseLayers[i].tile;
+                        tile = StaticNoiseSets[set].noiseLayers[i].tile;
                         break;
                     }
                     else if(noiseValue < 0 || noiseValue > 1)
                     {
-                        tile = staticNoiseSets[set].noiseLayers[i].tile;
+                        tile = StaticNoiseSets[set].noiseLayers[i].tile;
                         break;
                     }
                 }
@@ -73,21 +69,38 @@ namespace UnityEngine.Tilemaps.ProceduralGeneration
     [System.Serializable]
     public struct NoiseLayer
     {
+        public string name;
+        [Space(2)]
+        public TileBase tile;
+        [Space(1)]
         public bool isWall;
 
-        public TileBase tile;
-
+        [ConditionalHide("isWall" , true, true)]
         [Range(0, 1)]
         public float minRange;
+
+        
+        [ConditionalHide("isWall", true, true)]
         [Range(0, 1)]
         public float maxRange;
     }
     [System.Serializable]
     public struct NoiseSet
     {
+        public string name; 
+
+        [Space(2)]
         public NoiseLayer[] noiseLayers;
+
+        public void SetDefaultNames()
+        {
+            for(int i = 0; i < noiseLayers.Length; i++)
+            {
+                if (noiseLayers[i].name == "" || noiseLayers[i].name == null)
+                {
+                    noiseLayers[i].name = "Tile Layer" + " " + i;
+                }
+            }
+        }
     }
 }
-
-
-
