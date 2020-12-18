@@ -39,9 +39,9 @@ namespace UnityEngine.Tilemaps.tilegenX
             base.Update();
         }
 
-        public static TileBase GetTile(int seed, float amplitude, float lacunarity, Vector3 position, int set)
+        public static DynamicTile GetTile(int seed, float amplitude, float lacunarity, Vector3 position, int set)
         {
-            TileBase tile = null;
+            DynamicTile tile = null;
 
             float noiseValue = Mathf.PerlinNoise(((float)position.x + seed) * amplitude / lacunarity, ((float)position.y + seed) * amplitude / lacunarity);
 
@@ -70,23 +70,20 @@ namespace UnityEngine.Tilemaps.tilegenX
     public struct NoiseLayer
     {
         public string name;
+       
         [Space(2)]
-        public TileBase tile;
-        [Space(1)]
-        public bool isWall;
+        public DynamicTile tile;
 
-        [ConditionalHide("isWall" , true, true)]
         [Range(0, 1)]
         public float minRange;
 
-        
-        [ConditionalHide("isWall", true, true)]
         [Range(0, 1)]
         public float maxRange;
     }
     [System.Serializable]
     public struct NoiseSet
     {
+        [HideInInspector()]
         public string name; 
 
         [Space(2)]

@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61752683141a8e04e9898b90f6d6ce59, type: 3}
+  m_Name: New Dynamic Tile
+  m_EditorClassIdentifier: 
+  sprites:
+  - name: Set 1
+    center: {fileID: 21300000, guid: 5b959f7f8e0666a46869d7217e6406d2, type: 3}
+    left: {fileID: 21300000, guid: a7b14c008fba35b42bb910c54bacce16, type: 3}
+    bot: {fileID: 21300000, guid: fc2452ddaa0be5c4691de1c39f23ff61, type: 3}
+    top: {fileID: 21300000, guid: 94191ab136e665349a737ed7cf8f96f4, type: 3}
+    right: {fileID: 21300000, guid: 3270bcf669d32ca429ee0b5f29db0e08, type: 3}
+    leftTop: {fileID: 21300000, guid: 310bc95f35c035b47918212a74bb2e5d, type: 3}
+    leftbot: {fileID: 21300000, guid: 796be56185c418d479775bc6e3deb9f4, type: 3}
+    rightTop: {fileID: 21300000, guid: 4c8fe6791303eed4d960692dfd430d08, type: 3}
+    rightBot: {fileID: 21300000, guid: 8f3031132fcb7d24481023ab897b53de, type: 3}
+    topEnd: {fileID: 21300000, guid: 9ef21201c8314dc409e5c2fb924e54ff, type: 3}
+    botEnd: {fileID: 21300000, guid: 6ec399979ad2fd0478d5080f827ea7be, type: 3}
+    leftEnd: {fileID: 21300000, guid: b11fd9fc087918042bb5b8aff37a4bb4, type: 3}
+    rightEnd: {fileID: 21300000, guid: 40da4ad22ed1124468faf564188fc2ca, type: 3}
+    unique: {fileID: 21300000, guid: a1e68c3286b362b4daaf2c1712d0ce1c, type: 3}
+    cross: {fileID: 0}
+    tBot: {fileID: 0}
+    tTop: {fileID: 0}
+    tLeft: {fileID: 0}
+    tRight: {fileID: 0}
+  - name: Set 2
+    center: {fileID: 21300000, guid: 174fa99634fdae74e9575c4c98433915, type: 3}
+    left: {fileID: 21300000, guid: a7b14c008fba35b42bb910c54bacce16, type: 3}
+    bot: {fileID: 21300000, guid: fc2452ddaa0be5c4691de1c39f23ff61, type: 3}
+    top: {fileID: 21300000, guid: 94191ab136e665349a737ed7cf8f96f4, type: 3}
+    right: {fileID: 21300000, guid: 3270bcf669d32ca429ee0b5f29db0e08, type: 3}
+    leftTop: {fileID: 21300000, guid: 310bc95f35c035b47918212a74bb2e5d, type: 3}
+    leftbot: {fileID: 21300000, guid: 796be56185c418d479775bc6e3deb9f4, type: 3}
+    rightTop: {fileID: 21300000, guid: 4c8fe6791303eed4d960692dfd430d08, type: 3}
+    rightBot: {fileID: 21300000, guid: 8f3031132fcb7d24481023ab897b53de, type: 3}
+    topEnd: {fileID: 21300000, guid: 9ef21201c8314dc409e5c2fb924e54ff, type: 3}
+    botEnd: {fileID: 21300000, guid: 6ec399979ad2fd0478d5080f827ea7be, type: 3}
+    leftEnd: {fileID: 21300000, guid: b11fd9fc087918042bb5b8aff37a4bb4, type: 3}
+    rightEnd: {fileID: 21300000, guid: 40da4ad22ed1124468faf564188fc2ca, type: 3}
+    unique: {fileID: 21300000, guid: a1e68c3286b362b4daaf2c1712d0ce1c, type: 3}
+    cross: {fileID: 0}
+    tBot: {fileID: 0}
+    tTop: {fileID: 0}
+    tLeft: {fileID: 0}
+    tRight: {fileID: 0}
+  isLimit: 1

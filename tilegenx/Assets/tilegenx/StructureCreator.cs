@@ -5,6 +5,8 @@ using UnityEngine.Tilemaps.tilegenX;
 
 public class StructureCreator : MonoBehaviour
 {
+    public DynamicTile dynamicTile;
+
     public Transform player;
     public Grid grid;
     public Tilemap tilemap;
@@ -17,21 +19,6 @@ public class StructureCreator : MonoBehaviour
 
     public int tileSet;
 
-    public TileBase rightTopCornerTile = null;
-    public TileBase rightBotCornerTile = null;
-    public TileBase leftTopCornerTile = null;
-    public TileBase leftBotCornerTile = null;
-
-    public TileBase rightTopInnerCornerTile = null;
-    public TileBase rightBotInnerCornerTile = null;
-    public TileBase leftTopInnerCornerTile = null;
-    public TileBase leftBotInnerCornerTile = null;
-
-    public TileBase topBorderTile = null;
-    public TileBase leftBorderTile = null;
-    public TileBase rightBorderTile = null;
-    public TileBase botBorderTile = null;
-
     private Vector3Int lastPlayerCellPosition;
     private Vector3Int lastGenerationCellPosition;
 
@@ -41,8 +28,6 @@ public class StructureCreator : MonoBehaviour
     private int randomSize = 0;
     private int randomOffsetX = 0;
     private int randomOffsetY = 0;
-
-    private List<Generator> generators = new List<Generator>();
 
     private void Awake()
     {
@@ -62,31 +47,14 @@ public class StructureCreator : MonoBehaviour
                 randomOffsetX = Random.Range(-5, 5);
                 randomOffsetY = Random.Range(-5, 5);
 
-                Generator generator = new Generator();
+                Generator generator = new Generator(tilemap, wallTilemap, dynamicTile);
 
-                generators.Add(generator);
+                generator.GenerateGrid(randomX, randomY, randomCenterOnRange, randomSize, randomOffsetX, randomOffsetY, seed, amplitude, lacunarity, tileSet);
+                generator.GenerateLimits();
 
                 lastGenerationCellPosition = PlayerCellPosition();
             }
-
-            foreach (Generator generator in generators)
-            {
-                generator.GenerateGrid(randomX, randomY, randomCenterOnRange, randomSize, randomOffsetX, randomOffsetY, tilemap, seed, amplitude, lacunarity, tileSet);
-
-
-                generator.FindLimits(tilemap);
-
-                generator.GenerateLimits(wallTilemap, rightTopCornerTile, rightBotCornerTile, leftTopCornerTile, leftBotCornerTile,
-                    rightTopInnerCornerTile, rightBotInnerCornerTile, leftTopInnerCornerTile, leftBotInnerCornerTile,
-                    topBorderTile, leftBorderTile, rightBorderTile, botBorderTile);
-            }
-
-            lastPlayerCellPosition = PlayerCellPosition();
         }
-       
-
-       
-
     }
     public Vector3Int PlayerCellPosition()
     {

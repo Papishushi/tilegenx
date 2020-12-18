@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61752683141a8e04e9898b90f6d6ce59, type: 3}
+  m_Name: WorldDynamic_1
+  m_EditorClassIdentifier: 
+  sprites:
+  - name: Set 1
+    center: {fileID: 21300000, guid: 18c37d3a00d12b04dac38dc97b1534c9, type: 3}
+    left: {fileID: 21300000, guid: 75ea1e5aebd7a6f4199c10e96af8e968, type: 3}
+    bot: {fileID: 21300000, guid: 780b8ccb4d22902498207d491a67cb96, type: 3}
+    top: {fileID: 21300000, guid: 780b8ccb4d22902498207d491a67cb96, type: 3}
+    right: {fileID: 21300000, guid: 75ea1e5aebd7a6f4199c10e96af8e968, type: 3}
+    leftTop: {fileID: 21300000, guid: 6c1ec1e1754267e42b2430741f05c51b, type: 3}
+    leftbot: {fileID: 21300000, guid: b5db1b41d744c324191126d3192e621b, type: 3}
+    rightTop: {fileID: 21300000, guid: 145ee69dd404b8b45ae8f77eca986a96, type: 3}
+    rightBot: {fileID: 21300000, guid: cd73453bf2d1abc46bded98cf80a4be4, type: 3}
+    topEnd: {fileID: 21300000, guid: cfc7a6a97200f1641a36a253ad86cd48, type: 3}
+    botEnd: {fileID: 21300000, guid: 0450f3db6607d654fa1578a9446a1df8, type: 3}
+    leftEnd: {fileID: 21300000, guid: 7c9c474ad60cb394e8a0e5eb56b714cb, type: 3}
+    rightEnd: {fileID: 21300000, guid: ce607f6f326361b4daa6e4719e9adbc4, type: 3}
+    unique: {fileID: 21300000, guid: fced1ea6c993328449f6c6277127c291, type: 3}
+    cross: {fileID: 21300000, guid: fbd44c2ae61a7aa449b31d4adad749fc, type: 3}
+    tBot: {fileID: 21300000, guid: 8e176e76ecf978045b8f7061b04b1a88, type: 3}
+    tTop: {fileID: 21300000, guid: b83610e59f5b1a949a47fccf93a88f66, type: 3}
+    tLeft: {fileID: 21300000, guid: a3f81b57e4221f0428492e115ac9ef62, type: 3}
+    tRight: {fileID: 21300000, guid: d7416f4560736f749aabece2b9700c04, type: 3}
+  - name: Set 2
+    center: {fileID: 21300000, guid: b69fec4ac33ef5f40821ccb38147d5c0, type: 3}
+    left: {fileID: 21300000, guid: e8bcf16c66fefc6498ddb26ffca5c1ec, type: 3}
+    bot: {fileID: 21300000, guid: 63e74beeef6e69e489237545747ed00b, type: 3}
+    top: {fileID: 21300000, guid: 63e74beeef6e69e489237545747ed00b, type: 3}
+    right: {fileID: 21300000, guid: e8bcf16c66fefc6498ddb26ffca5c1ec, type: 3}
+    leftTop: {fileID: 21300000, guid: 6c1ec1e1754267e42b2430741f05c51b, type: 3}
+    leftbot: {fileID: 21300000, guid: b5db1b41d744c324191126d3192e621b, type: 3}
+    rightTop: {fileID: 21300000, guid: 145ee69dd404b8b45ae8f77eca986a96, type: 3}
+    rightBot: {fileID: 21300000, guid: cd73453bf2d1abc46bded98cf80a4be4, type: 3}
+    topEnd: {fileID: 21300000, guid: cfc7a6a97200f1641a36a253ad86cd48, type: 3}
+    botEnd: {fileID: 21300000, guid: 0450f3db6607d654fa1578a9446a1df8, type: 3}
+    leftEnd: {fileID: 21300000, guid: 7c9c474ad60cb394e8a0e5eb56b714cb, type: 3}
+    rightEnd: {fileID: 21300000, guid: ce607f6f326361b4daa6e4719e9adbc4, type: 3}
+    unique: {fileID: 21300000, guid: fced1ea6c993328449f6c6277127c291, type: 3}
+    cross: {fileID: 21300000, guid: fbd44c2ae61a7aa449b31d4adad749fc, type: 3}
+    tBot: {fileID: 21300000, guid: 8e176e76ecf978045b8f7061b04b1a88, type: 3}
+    tTop: {fileID: 21300000, guid: b83610e59f5b1a949a47fccf93a88f66, type: 3}
+    tLeft: {fileID: 21300000, guid: a3f81b57e4221f0428492e115ac9ef62, type: 3}
+    tRight: {fileID: 21300000, guid: d7416f4560736f749aabece2b9700c04, type: 3}
+  isLimit: 0

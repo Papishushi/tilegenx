@@ -51,7 +51,7 @@ public class WorldCreator : Singleton<WorldCreator>
     private void Awake()
     {
         lastPlayerCellPosition = new Vector3Int(Random.Range(int.MinValue, int.MaxValue), Random.Range(int.MinValue, int.MaxValue), Random.Range(int.MinValue, int.MaxValue));
-        generator = new Generator();
+        generator = new Generator(tilemap);
     }
 
     public override void Update()
@@ -64,17 +64,17 @@ public class WorldCreator : Singleton<WorldCreator>
             {
                 case Generator.TileLayerMode.Standard:
 
-                    generator.GenerateGrid(x, y, PlayerCellPosition(), tilemap, seed, amplitude, lacunarity, 0);
+                    generator.GenerateGrid(x, y, PlayerCellPosition(), seed, amplitude, lacunarity, 0);
                     break;
 
                 case Generator.TileLayerMode.Cross:
 
-                    generator.GenerateGrid(x, y, PlayerCellPosition(), size, offsetX, offsetY, tilemap, seed, amplitude, lacunarity, 0);
+                    generator.GenerateGrid(x, y, PlayerCellPosition(), size, offsetX, offsetY, seed, amplitude, lacunarity, 0);
                     break;
 
                 case Generator.TileLayerMode.Circular:
 
-                    generator.GenerateGrid(PlayerCellPosition(), size, circularGridMode, tilemap, seed, amplitude, lacunarity, 0);
+                    generator.GenerateGrid(PlayerCellPosition(), size, circularGridMode, seed, amplitude, lacunarity, 0);
                     break;
                 default:
 

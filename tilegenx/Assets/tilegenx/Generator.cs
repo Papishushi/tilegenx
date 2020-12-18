@@ -23,24 +23,17 @@ namespace UnityEngine.Tilemaps.tilegenX
     {
         #region |·Class declaration·|
 
+        public readonly Tilemap tilemap;
+
+        public readonly Tilemap wallTilemap;
+
+        public readonly DynamicTile dynamicTile;
+
         public readonly List<Vector3Int> ActiveTiles = new List<Vector3Int>();
 
-        private readonly List<Vector3Int> RightTopCornerTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> LeftTopCornerTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> RightBotCornerTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> LeftBotCornerTiles = new List<Vector3Int>();
+        private readonly Dictionary<Vector3Int, TileBase> GeneratedWorldDictionary = new Dictionary<Vector3Int, TileBase>();
 
-        private readonly List<Vector3Int> RightTopInnerCornerTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> LeftTopInnerCornerTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> RightBotInnerCornerTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> LeftBotInnerCornerTiles = new List<Vector3Int>();
-
-        private readonly List<Vector3Int> TopBorderTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> LeftBorderTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> RightBorderTiles = new List<Vector3Int>();
-        private readonly List<Vector3Int> BotBorderTiles = new List<Vector3Int>();
-
-        private readonly Dictionary<Vector3Int, TileBase> GeneratedWorldDictionary = new Dictionary<Vector3Int, TileBase>(); 
+        private Vector3Int lastCenter = Vector3Int.zero;
 
         public enum CircularGridMode
         {
@@ -56,11 +49,31 @@ namespace UnityEngine.Tilemaps.tilegenX
         };
         #endregion
 
+        #region |·Initializators·|
+
+        public Generator(Tilemap tilemap)
+        {
+            this.tilemap = tilemap;
+        }
+        public Generator (Tilemap tilemap, Tilemap wallTilemap, DynamicTile dynamicTile)
+        {
+            this.tilemap = tilemap;
+            this.wallTilemap = wallTilemap;
+            this.dynamicTile = dynamicTile;
+        }
+
+        #endregion
+
         #region |·Grids·|
 
         ////////////////////
         // Standard Grids //
         ////////////////////
+
+        private Vector2Int UpdateDirection()
+        {
+            return Vector2Int.zero;
+        }
 
         /// <summary>
         /// Generate a dynamic and transformable rectangular grid.
@@ -73,10 +86,10 @@ namespace UnityEngine.Tilemaps.tilegenX
         /// <param name="amplitude"></param>
         /// <param name="lacunarity"></param>
         /// <param name="set">The set of tiles that will be used by the generator.</param>
-        public void GenerateGrid(int x, int y, Vector3Int center, Tilemap tilemap, int seed, float amplitude, float lacunarity, int set)
+        public void GenerateGrid(int x, int y, Vector3Int center, int seed, float amplitude, float lacunarity, int set)
         {
             /// Cast the list to an array for optimization purposes.
-             Vector3Int[] activeTilesToArray = ActiveTiles.ToArray();
+            Vector3Int[] activeTilesToArray = ActiveTiles.ToArray();
             /// Everytime this method is called we clear from the tilemap all the tiles contained in ActiveTiles.
             for (int i = 0; i < activeTilesToArray.Length; i++)
             {
@@ -109,7 +122,9 @@ namespace UnityEngine.Tilemaps.tilegenX
                     /// Add the current local index to ActiveTiles list
                     ActiveTiles.Add(indexPosition);
                 }
-            } 
+            }
+
+            lastCenter = center;
         }
 
         /////////////////
@@ -127,7 +142,7 @@ namespace UnityEngine.Tilemaps.tilegenX
         /// <param name="offsetY">This is the offset of the cross arms parallel to the X axys.</param>
         /// <param name="tilemap">The Tilemap that will be used.</param>
         /// <param name="tile">The tile used for the generation representation.</param>
-        public  void GenerateGrid(int x, int y, Vector3Int center, int size, int offsetX, int offsetY, Tilemap tilemap, int seed, float amplitude, float lacunarity, int set)
+        public  void GenerateGrid(int x, int y, Vector3Int center, int size, int offsetX, int offsetY, int seed, float amplitude, float lacunarity, int set)
         {
             /// Everytime this method is called we clear from the tilemap all the tiles contained in ActiveTiles.
             foreach (Vector3Int tilePosition in ActiveTiles)
@@ -159,7 +174,7 @@ namespace UnityEngine.Tilemaps.tilegenX
                         }
                         else
                         {
-                            tilemap.SetTile(indexPosition, NoiseTileGenerator.GetTile(seed, amplitude, lacunarity, tilemap.CellToWorld(indexPosition), set));
+                            tilemap.SetTile(indexPosition, dynamicTile);
 
                             GeneratedWorldDictionary.Add(indexPosition, tilemap.GetTile(indexPosition));
                         }
@@ -172,6 +187,8 @@ namespace UnityEngine.Tilemaps.tilegenX
                     }
                 }
             }
+
+            lastCenter = center;
         } 
 
         ////////////////////
@@ -186,7 +203,7 @@ namespace UnityEngine.Tilemaps.tilegenX
         /// <param name="circularGridMode">This is the mode in witch the generation will take place. Standard for normal generation, Squared for squared magnitude generation.</param>
         /// <param name="tilemap">The Tilemap that will be used.</param>
         /// <param name="tile">The tile used for the generation representation.</param>
-        public  void GenerateGrid(Vector3Int center, int size, CircularGridMode circularGridMode, Tilemap tilemap, int seed, float amplitude, float lacunarity, int set)
+        public  void GenerateGrid(Vector3Int center, int size, CircularGridMode circularGridMode, int seed, float amplitude, float lacunarity, int set)
         {
             int x = size * 2;
             int y = size * 2;
@@ -263,341 +280,25 @@ namespace UnityEngine.Tilemaps.tilegenX
                     }
                 }
             }
+
+            lastCenter = center;
+
         }
         #endregion
 
         #region |·Wall Zones·|
-        private void FindCorners(Tilemap tilemap)
+        public void GenerateLimits()
         {
-            LeftBotCornerTiles.Clear();
-            LeftTopCornerTiles.Clear();
-            RightBotCornerTiles.Clear();
-            RightTopCornerTiles.Clear();
-
-            foreach (Vector3Int cell in ActiveTiles)
+            foreach(Vector3Int position in ActiveTiles)
             {
-                if(tilemap.HasTile(cell))
+                DynamicTile temp = (DynamicTile)tilemap.GetTile(position);
+
+                if(temp != null && temp.isLimit)
                 {
-                    if (!tilemap.HasTile(cell - new Vector3Int(1, 0, 0)) && !tilemap.HasTile(cell - new Vector3Int(0, 1, 0)))
-                    {
-                        LeftBotCornerTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell - new Vector3Int(1, 0, 0)) && !tilemap.HasTile(cell + new Vector3Int(0, 1, 0)))
-                    {
-                        LeftTopCornerTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell + new Vector3Int(1, 0, 0)) && !tilemap.HasTile(cell - new Vector3Int(0, 1, 0)))
-                    {
-                        RightBotCornerTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell + new Vector3Int(1, 0, 0)) && !tilemap.HasTile(cell + new Vector3Int(0, 1, 0)))
-                    {
-                        RightTopCornerTiles.Add(cell);
-                    }
-                    else
-                    {
-                        TileBase temp;
-
-                        GeneratedWorldDictionary.TryGetValue(cell, out temp);
-
-                        tilemap.SetTile(cell, temp);
-                    }
-                } 
-            }
-
-        }
-        private void GenerateCorners(Tilemap tilemap, TileBase rightTopCornerTile, TileBase rightBotCornerTile, TileBase leftTopCornerTile, TileBase leftBotCornerTile)
-        {
-            foreach (Vector3Int tilePosition in LeftBotCornerTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != leftBotCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, leftBotCornerTile);
-                    }
-                }
-              
-            }
-            foreach (Vector3Int tilePosition in LeftTopCornerTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != leftTopCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, leftTopCornerTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in RightBotCornerTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != rightBotCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, rightBotCornerTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in RightTopCornerTiles)
-            {
-                if(ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != rightTopCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, rightTopCornerTile);
-                    }
-                }
-            }
-
-        }
-
-        private void FindInnerCorners(Tilemap tilemap)
-        {
-
-            LeftBotInnerCornerTiles.Clear();
-            LeftTopInnerCornerTiles.Clear();
-            RightBotInnerCornerTiles.Clear();
-            RightTopInnerCornerTiles.Clear();
-
-            foreach (Vector3Int cell in ActiveTiles)
-            {
-                if (tilemap.HasTile(cell))
-                {
-                    if (!tilemap.HasTile(cell - new Vector3Int(1, 1, 0)) && tilemap.HasTile(cell - new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell - new Vector3Int(1, 0, 0)))
-                    {
-                        LeftBotInnerCornerTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell - new Vector3Int(1, -1, 0)) && tilemap.HasTile(cell + new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell - new Vector3Int(1, 0, 0)))
-                    {
-                        LeftTopInnerCornerTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell - new Vector3Int(-1, 1, 0)) && tilemap.HasTile(cell - new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell + new Vector3Int(1, 0, 0)))
-                    {
-                        RightBotInnerCornerTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell - new Vector3Int(-1, -1, 0)) && tilemap.HasTile(cell + new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell + new Vector3Int(1, 0, 0)))
-                    {
-                        RightTopInnerCornerTiles.Add(cell);
-                    }
-                    else
-                    {
-                        TileBase temp;
-
-                        GeneratedWorldDictionary.TryGetValue(cell, out temp);
-
-                        tilemap.SetTile(cell, temp);
-                    }
+                    wallTilemap.SetTile(position, ScriptableObject.CreateInstance<Tile>());
                 }
             }
         }
-        
-        private void GenerateInnerCorners(Tilemap tilemap, TileBase rightTopInnerCornerTile, TileBase rightBotInnerCornerTile, TileBase leftTopInnerCornerTile, TileBase leftBotInnerCornerTile)
-        {
-            foreach (Vector3Int tilePosition in LeftBotInnerCornerTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if(temp != leftBotInnerCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, leftBotInnerCornerTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in LeftTopInnerCornerTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != leftTopInnerCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, leftTopInnerCornerTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in RightBotInnerCornerTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != rightBotInnerCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, rightBotInnerCornerTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in RightTopInnerCornerTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != rightTopInnerCornerTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, rightTopInnerCornerTile);
-                    }
-                }
-            }
-
-        }
-
-        private void FindBorders(Tilemap tilemap)
-        {
-            LeftBorderTiles.Clear();
-            RightBorderTiles.Clear();
-            BotBorderTiles.Clear();
-            TopBorderTiles.Clear();
-
-            foreach (Vector3Int cell in ActiveTiles)
-            {
-                if (tilemap.HasTile(cell))
-                {
-                    if (!tilemap.HasTile(cell - new Vector3Int(1, 0, 0)) && tilemap.HasTile(cell - new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell + new Vector3Int(0, 1, 0)))
-                    {
-                        LeftBorderTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell + new Vector3Int(1, 0, 0)) && tilemap.HasTile(cell - new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell + new Vector3Int(0, 1, 0)))
-                    {
-                        RightBorderTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell - new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell - new Vector3Int(1, 0, 0)) && tilemap.HasTile(cell + new Vector3Int(1, 0, 0)))
-                    {
-                        BotBorderTiles.Add(cell);
-                    }
-                    else if (!tilemap.HasTile(cell + new Vector3Int(0, 1, 0)) && tilemap.HasTile(cell - new Vector3Int(1, 0, 0)) && tilemap.HasTile(cell + new Vector3Int(1, 0, 0)))
-                    {
-                        TopBorderTiles.Add(cell);
-                    }
-                    else
-                    {
-                        TileBase temp;
-
-                        GeneratedWorldDictionary.TryGetValue(cell, out temp);
-
-                        tilemap.SetTile(cell, temp);
-                    }
-                }
-            }
-
-        }
-        private void GenerateBorders(Tilemap tilemap, TileBase topBorderTile, TileBase leftBorderTile, TileBase rightBorderTile, TileBase botBorderTile)
-        {
-            foreach (Vector3Int tilePosition in LeftBorderTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != leftBorderTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, leftBorderTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in RightBorderTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != rightBorderTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, rightBorderTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in BotBorderTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != botBorderTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, botBorderTile);
-                    }
-                }
-            }
-            foreach (Vector3Int tilePosition in TopBorderTiles)
-            {
-                if (ActiveTiles.Contains(tilePosition))
-                {
-                    TileBase temp;
-
-                    GeneratedWorldDictionary.TryGetValue(tilePosition, out temp);
-
-                    if (temp != topBorderTile)
-                    {
-                        GeneratedWorldDictionary.Remove(tilePosition);
-                        GeneratedWorldDictionary.Add(tilePosition, topBorderTile);
-                    }
-                }
-            }
-
-        }
-
-        #region |·Public Wall Zones·|
-        public void FindLimits(Tilemap tilemap)
-        {
-            FindCorners(tilemap);
-            FindInnerCorners(tilemap);
-            FindBorders(tilemap);
-        }
-
-        public void GenerateLimits(Tilemap tilemap, TileBase rightTopCornerTile, TileBase rightBotCornerTile, TileBase leftTopCornerTile, TileBase leftBotCornerTile,
-            TileBase rightTopInnerCornerTile, TileBase rightBotInnerCornerTile, TileBase leftTopInnerCornerTile, TileBase leftBotInnerCornerTile,
-            TileBase topBorderTile, TileBase leftBorderTile, TileBase rightBorderTile, TileBase botBorderTile)
-        {
-            GenerateCorners(tilemap, rightTopCornerTile, rightBotCornerTile, leftTopCornerTile, leftBotCornerTile);
-            GenerateInnerCorners(tilemap, rightTopInnerCornerTile, rightBotInnerCornerTile, leftTopInnerCornerTile, leftBotInnerCornerTile);
-            GenerateBorders(tilemap, topBorderTile, leftBorderTile, rightBorderTile, botBorderTile);
-        }
-        #endregion
         #endregion
     }
 }
